@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Leslieryin · 自动化交互实验台</title>
+<meta name="description" content="控制理论、过程控制、微机原理的交互实验台，全部在浏览器本地运行。不用装环境，打开网页就能拖滑块、按按钮、看波形。">
+<meta property="og:title" content="Leslieryin · 自动化交互实验台">
+<meta property="og:description" content="四个在线实验台：自控原理、现代控制、过程控制、8086 虚拟实验箱。零依赖，浏览器本地计算。">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0f6cbd">
+<style>
+:root{
+  --bg:#f5f7fa; --panel:#ffffff; --ink:#1c2733; --muted:#6b7a89;
+  --accent:#0f6cbd; --accent2:#d97706; --good:#15803d;
+  --line:#dbe3ec; --chip:#eef4fb; --chipInk:#2c5f8a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+  font-size:15px;line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1000px;margin:0 auto;padding:0 20px}
+
+/* ---------- 顶部 ---------- */
+.hero{background:var(--panel);border-bottom:1px solid var(--line);padding:52px 0 44px}
+.eyebrow{margin:0 0 10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--accent);font-weight:600}
+.hero h1{margin:0 0 14px;font-size:34px;line-height:1.25;font-weight:600;letter-spacing:-.01em}
+.lede{margin:0;max-width:620px;font-size:16px;color:var(--muted);line-height:1.7}
+.lede b{color:var(--ink);font-weight:600}
+.stats{display:flex;gap:40px;margin-top:32px;flex-wrap:wrap}
+.stats div{display:flex;flex-direction:column}
+.stats b{font-size:24px;font-weight:600;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.stats span{font-size:12.5px;color:var(--muted);margin-top:2px}
+
+/* ---------- 通用区块 ---------- */
+section{margin-top:52px}
+.sec-head{margin:0 0 6px;font-size:19px;font-weight:600}
+.sec-sub{margin:0 0 22px;font-size:14px;color:var(--muted)}
+
+/* ---------- 能力线 ---------- */
+.track{list-style:none;display:flex;flex-wrap:wrap;gap:0;margin:0;padding:0;
+  border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel)}
+.track li{flex:1 1 0;min-width:120px;padding:14px 16px;position:relative;
+  font-size:13.5px;color:var(--muted);border-right:1px solid var(--line)}
+.track li:last-child{border-right:none}
+.track li b{display:block;font-size:11px;font-weight:600;color:var(--accent);
+  font-variant-numeric:tabular-nums;margin-bottom:3px}
+.track li.on{color:var(--ink);background:var(--chip)}
+
+/* ---------- 实验台卡片 ---------- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{display:flex;flex-direction:column;background:var(--panel);
+  border:1px solid var(--line);border-radius:10px;padding:20px;
+  transition:border-color .15s ease,transform .15s ease}
+.card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card-top{display:flex;align-items:baseline;gap:10px;margin-bottom:8px}
+.num{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;
+  color:var(--accent);font-weight:600}
+.card h3{margin:0;font-size:16.5px;font-weight:600;letter-spacing:-.005em}
+.card p{margin:0 0 14px;font-size:13.5px;color:var(--muted);line-height:1.65;flex:1}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+.chip{background:var(--chip);color:var(--chipInk);border-radius:5px;
+  padding:3px 8px;font-size:11.5px;white-space:nowrap}
+.meta{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums;
+  padding-top:12px;border-top:1px solid var(--line);margin-bottom:14px}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-block;padding:7px 14px;border-radius:7px;font-size:13px;
+  border:1px solid var(--line);background:#fff;color:var(--ink);
+  transition:background .15s ease,border-color .15s ease,color .15s ease}
+.btn:hover{border-color:var(--accent);color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;font-weight:500}
+.btn.primary:hover{background:#0d5da3;border-color:#0d5da3;color:#fff}
+
+/* ---------- 工具列表 ---------- */
+.tools{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.tool{background:var(--panel);border:1px solid var(--line);border-radius:10px;
+  padding:16px 18px;transition:border-color .15s ease}
+.tool:hover{border-color:var(--accent)}
+.tool h4{margin:0 0 5px;font-size:14.5px;font-weight:600;display:flex;
+  align-items:center;gap:8px;flex-wrap:wrap}
+.tool h4 code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  font-size:12.5px;font-weight:400;color:var(--accent)}
+.tool p{margin:0 0 8px;font-size:12.5px;color:var(--muted);line-height:1.6}
+.tool .meta{border:none;padding:0;margin:0;font-size:11.5px}
+
+/* ---------- 其他 ---------- */
+.more{display:flex;flex-wrap:wrap;gap:8px}
+.more a{font-size:13px;padding:7px 13px;background:var(--panel);
+  border:1px solid var(--line);border-radius:8px;color:var(--muted);
+  transition:border-color .15s ease,color .15s ease}
+.more a:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ---------- 页脚 ---------- */
+footer{margin-top:64px;border-top:1px solid var(--line);background:var(--panel);
+  padding:26px 0 34px;font-size:13px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a{color:var(--accent)}
+footer a:hover{text-decoration:underline}
+
+@media (max-width:760px){
+  .hero{padding:38px 0 32px}
+  .hero h1{font-size:26px}
+  .lede{font-size:15px}
+  .grid,.tools{grid-template-columns:1fr}
+  .stats{gap:28px;margin-top:26px}
+  section{margin-top:40px}
+  /* 竖排：折成 2-2-1 会让最后一格孤零零占满一行，读起来反而不像一条线 */
+  .track{display:block}
+  .track li{width:100%;border-right:none;border-bottom:1px solid var(--line);padding:11px 16px}
+  .track li:last-child{border-bottom:none}
+  .track li b{display:inline;margin:0 10px 0 0}
+  .track li.on{background:var(--chip)}
+}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Leslieryin</p>
+    <h1>自动化专业的交互实验台</h1>
+    <p class="lede">
+      控制理论、过程控制、微机原理，全部在浏览器里跑。
+      <b>不用装环境、不用 clone、没有后端</b>——打开网页就能拖滑块、按按钮、看波形。
+    </p>
+    <div class="stats">
+      <div><b>4</b><span>在线实验台</span></div>
+      <div><b>13</b><span>开源仓库</span></div>
+      <div><b>0</b><span>运行时依赖</span></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section>
+    <h2 class="sec-head">一条从传递函数走到引脚的线</h2>
+    <p class="sec-sub">同一套知识可以从数学一路落到芯片上，这四台机器就是这条路。</p>
+    <ol class="track">
+      <li><b>01</b>经典控制</li>
+      <li><b>02</b>现代控制</li>
+      <li><b>03</b>过程控制</li>
+      <li><b>04</b>微机原理</li>
+      <li class="on"><b>05</b>在线仿真</li>
+    </ol>
+  </section>
+
+  <section>
+    <h2 class="sec-head">实验台</h2>
+    <p class="sec-sub">四个都能直接打开，全部计算在你自己的浏览器里完成。</p>
+    <div class="grid">
+
+      <article class="card">
+        <div class="card-top"><span class="num">01</span><h3>自动控制原理</h3></div>
+        <p>二阶系统阶跃响应、PID 整定、Bode 图、Nyquist 图、根轨迹。
+           参数一拖，曲线立刻重算，随时能看到稳定裕度怎么被吃掉。</p>
+        <div class="chips">
+          <span class="chip">二阶系统</span><span class="chip">PID</span>
+          <span class="chip">Bode</span><span class="chip">Nyquist</span>
+          <span class="chip">根轨迹</span>
+        </div>
+        <div class="meta">694 行单文件 · 零依赖 · 离线可用</div>
+        <div class="acts">
+          <a class="btn primary" href="https://leslieryin.github.io/control-lab/">在线打开</a>
+          <a class="btn" href="https://github.com/Leslieryin/control-lab">源码</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-top"><span class="num">02</span><h3>现代控制理论</h3></div>
+        <p>状态空间响应、能控性与能观性判据、Ackermann 极点配置、
+           状态观测器、卡尔曼滤波。矩阵运算全部手写，没有数学库。</p>
+        <div class="chips">
+          <span class="chip">状态空间</span><span class="chip">能控能观</span>
+          <span class="chip">极点配置</span><span class="chip">观测器</span>
+          <span class="chip">卡尔曼滤波</span>
+        </div>
+        <div class="meta">655 行单文件 · 手写矩阵运算 · 零依赖</div>
+        <div class="acts">
+          <a class="btn primary" href="https://leslieryin.github.io/modern-control-lab/">在线打开</a>
+          <a class="btn" href="https://github.com/Leslieryin/modern-control-lab">源码</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-top"><span class="num">03</span><h3>过程控制</h3></div>
+        <p>六个实验讲清纯滞后这一件事：滞后怎么把稳定系统推成发散、
+           Smith 预估为什么一失配就退化、串级为什么只对内环扰动有效、前馈到底补了什么。</p>
+        <div class="chips">
+          <span class="chip">FOPDT</span><span class="chip">纯滞后</span>
+          <span class="chip">Smith 预估</span><span class="chip">串级控制</span>
+          <span class="chip">前馈-反馈</span>
+        </div>
+        <div class="meta">1058 行 · 16 项数值断言 · 默认参数经扫描标定</div>
+        <div class="acts">
+          <a class="btn primary" href="https://leslieryin.github.io/process-control-lab/">在线打开</a>
+          <a class="btn" href="https://github.com/Leslieryin/process-control-lab">源码</a>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-top"><span class="num">04</span><h3>8086 虚拟实验箱</h3></div>
+        <p>把微机原理课设搬进浏览器，不用装 Proteus：8086 CPU 加 8255、8253、8259、ADC0808，
+           单步执行、看标志位、拖动模拟量——跑的是真实课设汇编，一字未改。</p>
+        <div class="chips">
+          <span class="chip">8086 CPU</span><span class="chip">8255</span>
+          <span class="chip">8253</span><span class="chip">8259</span>
+          <span class="chip">ADC0808</span>
+        </div>
+        <div class="meta">1894 行 · 41 条指令 · 52 项端到端断言</div>
+        <div class="acts">
+          <a class="btn primary" href="https://leslieryin.github.io/8086-emulator-lab/">在线打开</a>
+          <a class="btn" href="https://github.com/Leslieryin/8086-emulator-lab">源码</a>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-head">顺手做的小工具</h2>
+    <p class="sec-sub">都是被某件具体的事烦到之后写的，不是练手项目。</p>
+    <div class="tools">
+
+      <div class="tool">
+        <h4><code>windows-disk-cleanup</code></h4>
+        <p>Windows 磁盘清理。按「删了会不会丢东西」分三级安全模型，默认只读扫描，
+           路径白名单挡住误删——不碰回收站、文档、照片。</p>
+        <div class="meta">Python · 纯标准库 · 18 个测试</div>
+      </div>
+
+      <div class="tool">
+        <h4><code>bili-watcher</code></h4>
+        <p>B 站订阅与内容摘要。Node 只读引擎加 Chrome MV3 扩展，
+           MD5 与 WBI 签名自己算，只读公开数据。</p>
+        <div class="meta">Node · Chrome 扩展 · CI 校验签名算法</div>
+      </div>
+
+      <div class="tool">
+        <h4><code>photo-cleanup-pipeline</code></h4>
+        <p>手机照片整理。SHA-256 精确去重、HEIC 转码与假 JPG 识别、
+           pHash 相似图报告，删除走清单不自动执行。</p>
+        <div class="meta">Python · 清单式安全删除</div>
+      </div>
+
+      <div class="tool">
+        <h4><code>windows-healthcheck</code></h4>
+        <p>Windows 一键体检。只读 PowerShell 诊断脚本集，
+           覆盖硬件、启动项、安全、稳定性与显卡驱动，一键生成留档报告。</p>
+        <div class="meta">PowerShell · 全程只读</div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <h2 class="sec-head">还有</h2>
+    <p class="sec-sub">课设原件、数据库、资源导航。</p>
+    <div class="more">
+      <a href="https://github.com/Leslieryin/8086-microcomputer-lab">8086 课设原件（含 Proteus 工程）</a>
+      <a href="https://github.com/Leslieryin/database-course-design">SQL Server 数据库课设</a>
+      <a href="https://github.com/Leslieryin/awesome-automation-zh">自动化开源资源导航</a>
+      <a href="https://github.com/Leslieryin/comfyui-teaching-kit">ComfyUI 教学工作流</a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>全部项目以 MIT 许可开源，浏览器端计算不联网、不上传任何数据。</span>
+    <a href="https://github.com/Leslieryin">github.com/Leslieryin</a>
+  </div>
+</footer>
+
+</body>
+</html>
