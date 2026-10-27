@@ -1,5 +1,7 @@
 # leslieryin.github.io
 
+> **EN** — The entry page for every project: four interactive control labs and a set of small utilities, all running in the browser with zero runtime dependencies.
+
 个人作品入口页 —— **<https://leslieryin.github.io/>**
 
 把散在各个仓库里的实验台和工具收到一页上，一个链接就能看全貌。
