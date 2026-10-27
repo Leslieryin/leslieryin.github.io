@@ -98,6 +98,7 @@ footer{margin-top:64px;border-top:1px solid var(--line);background:var(--panel);
 footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
 footer a{color:var(--accent)}
 footer a:hover{text-decoration:underline}
+[id]{scroll-margin-top:96px}
 
 @media (max-width:760px){
   .hero{padding:38px 0 32px}
@@ -152,7 +153,7 @@ footer a:hover{text-decoration:underline}
     <p class="sec-sub">四个都能直接打开，全部计算在你自己的浏览器里完成。</p>
     <div class="grid">
 
-      <article class="card">
+      <article class="card" id="control-lab">
         <div class="card-top"><span class="num">01</span><h3>自动控制原理</h3></div>
         <p>二阶系统阶跃响应、PID 整定、Bode 图、Nyquist 图、根轨迹。
            参数一拖，曲线立刻重算，随时能看到稳定裕度怎么被吃掉。</p>
@@ -168,7 +169,7 @@ footer a:hover{text-decoration:underline}
         </div>
       </article>
 
-      <article class="card">
+      <article class="card" id="modern-control-lab">
         <div class="card-top"><span class="num">02</span><h3>现代控制理论</h3></div>
         <p>状态空间响应、能控性与能观性判据、Ackermann 极点配置、
            状态观测器、卡尔曼滤波。矩阵运算全部手写，没有数学库。</p>
@@ -184,7 +185,7 @@ footer a:hover{text-decoration:underline}
         </div>
       </article>
 
-      <article class="card">
+      <article class="card" id="process-control-lab">
         <div class="card-top"><span class="num">03</span><h3>过程控制</h3></div>
         <p>六个实验讲清纯滞后这一件事：滞后怎么把稳定系统推成发散、
            Smith 预估为什么一失配就退化、串级为什么只对内环扰动有效、前馈到底补了什么。</p>
@@ -200,7 +201,7 @@ footer a:hover{text-decoration:underline}
         </div>
       </article>
 
-      <article class="card">
+      <article class="card" id="8086-emulator-lab">
         <div class="card-top"><span class="num">04</span><h3>8086 虚拟实验箱</h3></div>
         <p>把微机原理课设搬进浏览器，不用装 Proteus：8086 CPU 加 8255、8253、8259、ADC0808，
            单步执行、看标志位、拖动模拟量——跑的是真实课设汇编，一字未改。</p>
@@ -224,28 +225,28 @@ footer a:hover{text-decoration:underline}
     <p class="sec-sub">都是被某件具体的事烦到之后写的，不是练手项目。</p>
     <div class="tools">
 
-      <div class="tool">
+      <div class="tool" id="windows-disk-cleanup">
         <h4><code>windows-disk-cleanup</code></h4>
         <p>Windows 磁盘清理。按「删了会不会丢东西」分三级安全模型，默认只读扫描，
            路径白名单挡住误删——不碰回收站、文档、照片。</p>
         <div class="meta">Python · 纯标准库 · 18 个测试</div>
       </div>
 
-      <div class="tool">
+      <div class="tool" id="bili-watcher">
         <h4><code>bili-watcher</code></h4>
         <p>B 站订阅与内容摘要。Node 只读引擎加 Chrome MV3 扩展，
            MD5 与 WBI 签名自己算，只读公开数据。</p>
         <div class="meta">Node · Chrome 扩展 · CI 校验签名算法</div>
       </div>
 
-      <div class="tool">
+      <div class="tool" id="photo-cleanup-pipeline">
         <h4><code>photo-cleanup-pipeline</code></h4>
         <p>手机照片整理。SHA-256 精确去重、HEIC 转码与假 JPG 识别、
            pHash 相似图报告，删除走清单不自动执行。</p>
         <div class="meta">Python · 清单式安全删除</div>
       </div>
 
-      <div class="tool">
+      <div class="tool" id="windows-healthcheck">
         <h4><code>windows-healthcheck</code></h4>
         <p>Windows 一键体检。只读 PowerShell 诊断脚本集，
            覆盖硬件、启动项、安全、稳定性与显卡驱动，一键生成留档报告。</p>
@@ -259,10 +260,10 @@ footer a:hover{text-decoration:underline}
     <h2 class="sec-head">还有</h2>
     <p class="sec-sub">课设原件、数据库、资源导航。</p>
     <div class="more">
-      <a href="https://github.com/Leslieryin/8086-microcomputer-lab">8086 课设原件（含 Proteus 工程）</a>
-      <a href="https://github.com/Leslieryin/database-course-design">SQL Server 数据库课设</a>
-      <a href="https://github.com/Leslieryin/awesome-automation-zh">自动化开源资源导航</a>
-      <a href="https://github.com/Leslieryin/comfyui-teaching-kit">ComfyUI 教学工作流</a>
+      <a id="8086-microcomputer-lab" href="https://github.com/Leslieryin/8086-microcomputer-lab">8086 课设原件（含 Proteus 工程）</a>
+      <a id="database-course-design" href="https://github.com/Leslieryin/database-course-design">SQL Server 数据库课设</a>
+      <a id="awesome-automation-zh" href="https://github.com/Leslieryin/awesome-automation-zh">自动化开源资源导航</a>
+      <a id="comfyui-teaching-kit" href="https://github.com/Leslieryin/comfyui-teaching-kit">ComfyUI 教学工作流</a>
     </div>
   </section>
 
