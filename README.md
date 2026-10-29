@@ -1,5 +1,7 @@
 # leslieryin.github.io
 
+![CI](https://github.com/Leslieryin/leslieryin.github.io/actions/workflows/ci.yml/badge.svg)
+
 > **EN** — The entry page for every project: four interactive control labs and a set of small utilities, all running in the browser with zero runtime dependencies.
 
 个人作品入口页 —— **<https://leslieryin.github.io/>**
