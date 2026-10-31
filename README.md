@@ -2,7 +2,7 @@
 
 ![CI](https://github.com/Leslieryin/leslieryin.github.io/actions/workflows/ci.yml/badge.svg)
 
-> **EN** — The entry page for every project: four interactive control labs and a set of small utilities, all running in the browser with zero runtime dependencies.
+> **EN** — The entry page for every project: five interactive labs (signals & systems, three control courses, and a microcomputer emulator) plus a set of small utilities, all running in the browser with zero runtime dependencies.
 
 个人作品入口页 —— **<https://leslieryin.github.io/>**
 
@@ -10,12 +10,13 @@
 
 ## 页面上有什么
 
-**四个在线实验台**，都是浏览器本地计算、零依赖、离线可用：
+**五个在线实验台**，都是浏览器本地计算、零依赖、离线可用：
 
 - [control-lab](https://leslieryin.github.io/control-lab/) —— 二阶系统阶跃响应、PID、Bode、Nyquist、根轨迹
 - [modern-control-lab](https://leslieryin.github.io/modern-control-lab/) —— 状态空间、能控能观、极点配置、状态观测器、卡尔曼滤波
 - [process-control-lab](https://leslieryin.github.io/process-control-lab/) —— FOPDT 与纯滞后、Smith 预估、串级、前馈-反馈
 - [8086-emulator-lab](https://leslieryin.github.io/8086-emulator-lab/) —— 8086 CPU + 8255/8253/8259/ADC0808，跑真实课设汇编
+- [signals-lab](https://leslieryin.github.io/signals-lab/) —— 采样与混叠、傅里叶级数与吉布斯、卷积、RC 滤波器、AM 调幅
 
 **四个小工具**：磁盘清理、B 站订阅、照片整理、Windows 体检。
 
