@@ -6,7 +6,7 @@
 <title>Leslieryin · 自动化交互实验台</title>
 <meta name="description" content="控制理论、过程控制、微机原理的交互实验台，全部在浏览器本地运行。不用装环境，打开网页就能拖滑块、按按钮、看波形。">
 <meta property="og:title" content="Leslieryin · 自动化交互实验台">
-<meta property="og:description" content="四个在线实验台：自控原理、现代控制、过程控制、8086 虚拟实验箱。零依赖，浏览器本地计算。">
+<meta property="og:description" content="五个在线实验台：自控原理、现代控制、过程控制、信号与系统、8086 虚拟实验箱。零依赖，浏览器本地计算。">
 <meta property="og:type" content="website">
 <meta name="theme-color" content="#0f6cbd">
 <link rel="canonical" href="https://leslieryin.github.io/">
@@ -223,6 +223,23 @@ footer a:hover{text-decoration:underline}
         <div class="acts">
           <a class="btn primary" href="https://leslieryin.github.io/8086-emulator-lab/">在线打开</a>
           <a class="btn" href="https://github.com/Leslieryin/8086-emulator-lab">源码</a>
+        </div>
+      </article>
+
+      <article class="card" id="signals-lab">
+        <div class="card-top"><span class="num">05</span><h3>信号与系统</h3></div>
+        <p>采样定理不再纸上谈兵：拖动 fs，看 5kHz 如何混叠成 3kHz——重建波
+           完美穿过每一个采样点，频率却全错了。还有方波合成的吉布斯过冲
+           （8.95% 恒定不消失）、卷积滑动面积、RC 的 −3dB 与 63.2%、AM 频谱搬移。</p>
+        <div class="chips">
+          <span class="chip">采样与混叠</span><span class="chip">傅里叶级数</span>
+          <span class="chip">吉布斯现象</span><span class="chip">卷积</span>
+          <span class="chip">RC 滤波器</span><span class="chip">AM 调幅</span>
+        </div>
+        <div class="meta">单文件 · 解析频谱 · 教材数值锚点全命中</div>
+        <div class="acts">
+          <a class="btn primary" href="https://leslieryin.github.io/signals-lab/">在线打开</a>
+          <a class="btn" href="https://github.com/Leslieryin/signals-lab">源码</a>
         </div>
       </article>
 
