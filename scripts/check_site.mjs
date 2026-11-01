@@ -37,14 +37,14 @@ const expectedAnchors = [
   'awesome-automation-zh',
   'comfyui-teaching-kit',
 ];
-const ids = new Set([...html.matchAll(/id="([^"]+)"/g)].map((m) => m[1]));
+const ids = new Set([...html.matchAll(/id="([^"]+)"/g)].map((m) => m[1] || m[2] || m[3]));
 for (const a of expectedAnchors) {
   if (!ids.has(a)) errors.push(`锚点 #${a} 缺失（仓库 About 的链接会跳空）`);
 }
 if (expectedAnchors.every((a) => ids.has(a))) ok.push(`仓库锚点 ${expectedAnchors.length} 个全部命中`);
 
 // 页内锚点链接也要能自洽
-const anchors = [...html.matchAll(/href="(?:https:\/\/leslieryin\.github\.io\/)?#([^"]+)"/g)].map((m) => m[1]);
+const anchors = [...html.matchAll(/href="(?:https:\/\/leslieryin\.github\.io\/)?#([^"]+)"/g)].map((m) => m[1] || m[2] || m[3]);
 for (const a of new Set(anchors)) {
   if (!ids.has(a)) errors.push(`页内锚点 #${a} 在首页找不到对应 id`);
 }
@@ -59,17 +59,18 @@ if (existsSync('404.html') && notFound.includes(SITE)) ok.push('404.html 可回�
 else errors.push('404.html 缺失或没有回首页的链接');
 
 // 5. 不引入外部资源（站点承诺零外部请求）
-const external = [...html.matchAll(/<(?:script|link|img)[^>]+(?:src|href)="(https?:[^"]+)"/g)]
-  .map((m) => m[1])
+const external = [...html.matchAll(/(?:<(?:script|link|img|video|source|iframe)[^>]+(?:src|href)="(https?:[^"]+)"|url\(\s*["']?(https?:[^)"']+)|@import\s+["']?(https?:[^"' ;]+))/g)]
+  .map((m) => m[1] || m[2] || m[3])
   .filter((u) => !u.startsWith(SITE) && !u.startsWith('data:'));
 if (external.length) errors.push(`首页引用了外部资源：${external.join(', ')}`);
 else ok.push('零外部资源引用');
 
-// 6. 四台实验台线上可达（GitHub Pages 偶发抖动，重试 3 次）
+// 6. 五台实验台线上可达（GitHub Pages 偶发抖动，重试 3 次）
 const labs = [
   'control-lab',
   'modern-control-lab',
   'process-control-lab',
+  'signals-lab',
   '8086-emulator-lab',
 ];
 for (const lab of labs) {
