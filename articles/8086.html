@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>不用装 Proteus：把 8086 微机原理课设搬进浏览器</title>
+<meta name="description" content="把 8086 微机原理课设搬进浏览器：源码不改，单步执行看标志位。附带一个 JZ/JNZ 写反的真 bug 复盘。">
+<style>
+:root{
+  --bg:#f5f7fa; --panel:#ffffff; --ink:#1c2733; --muted:#6b7a89;
+  --accent:#0f6cbd; --accent2:#d97706; --good:#15803d;
+  --line:#dbe3ec; --chip:#eef4fb; --chipInk:#2c5f8a;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:system-ui,-apple-system,"Segoe UI","Microsoft YaHei",sans-serif;
+  font-size:15.5px;line-height:1.78;-webkit-font-smoothing:antialiased}
+a{color:var(--accent);text-decoration:none}
+a:hover{text-decoration:underline}
+.wrap{max-width:820px;margin:0 auto;padding:0 22px}
+
+/* 顶部 */
+.top{background:var(--panel);border-bottom:1px solid var(--line);padding:20px 0}
+.top .wrap{display:flex;justify-content:space-between;align-items:center;gap:16px}
+.back{font-size:13.5px;color:var(--muted)}
+.back a{color:var(--accent);font-weight:500}
+
+article{padding:44px 0 80px}
+
+h1{font-size:29px;line-height:1.32;margin:0 0 6px;letter-spacing:-.01em}
+h2{font-size:20px;margin:40px 0 12px;padding-top:22px;
+  border-top:1px solid var(--line);letter-spacing:-.005em}
+h3{font-size:16.5px;margin:26px 0 8px}
+p{margin:13px 0}
+strong{font-weight:600}
+
+blockquote{margin:18px 0;padding:11px 16px;background:var(--chip);
+  border-left:3px solid var(--accent);border-radius:0 4px 4px 0;color:var(--muted)}
+blockquote p{margin:4px 0}
+
+code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  font-size:.87em;background:var(--chip);color:var(--chipInk);
+  padding:2px 5px;border-radius:4px}
+pre{background:#0f172a;color:#e2e8f0;border-radius:8px;padding:15px 17px;
+  overflow-x:auto;margin:18px 0;font-size:13px;line-height:1.62}
+pre code{background:none;color:inherit;padding:0;font-size:inherit}
+
+img{display:block;max-width:100%;height:auto;margin:22px auto;
+  border:1px solid var(--line);border-radius:8px;background:#fff}
+
+table{width:100%;border-collapse:collapse;margin:18px 0;font-size:14.5px}
+th,td{border:1px solid var(--line);padding:9px 11px;text-align:left;vertical-align:top}
+th{background:var(--chip);color:var(--chipInk);font-weight:600}
+tr:nth-child(even) td{background:#fbfcfe}
+
+ul,ol{padding-left:24px;margin:13px 0}
+li{margin:6px 0}
+hr{border:0;border-top:1px solid var(--line);margin:34px 0}
+
+footer{background:var(--panel);border-top:1px solid var(--line);padding:22px 0;
+  font-size:13px;color:var(--muted)}
+footer .wrap{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap}
+footer a{color:var(--accent)}
+
+@media(max-width:640px){
+  body{font-size:15px}
+  h1{font-size:23px}
+  h2{font-size:18px}
+  pre{font-size:12px}
+}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="wrap">
+    <a class="back" href="/">← 全部作品</a>
+    <a class="back" href="https://leslieryin.github.io/8086-emulator-lab/">在线打开模拟器 →</a>
+  </div>
+</div>
+
+<div class="wrap">
+<article>
+<h1>不用装 Proteus：我把 8086 微机原理课设搬进了浏览器</h1>
+<blockquote>
+<p>源码一字未改，跑的就是交上去的那份汇编。跑起来之后，还发现原版有个 bug。</p>
+</blockquote>
+<h2>一、先说说那堵墙</h2>
+<p>微机原理课设做完，交上去的是一堆东西：<code>.asm</code> 源文件、<code>.pdsprj</code> Proteus 工程、还有一份实验报告。</p>
+<p>问题是，<strong>别人想看你的抢答器真的跑起来，得先跨过一道墙</strong>：</p>
+<ol>
+<li>装 Proteus（好几个 G，还得找安装包）</li>
+<li>找 8086 元件库（默认库里没有）</li>
+<li>照着报告里的连线图把电路搭出来</li>
+<li>用 MASM 把 <code>.asm</code> 汇编成 exe</li>
+<li>手动把 exe 载入程序存储器</li>
+<li>点运行</li>
+</ol>
+<p>绝大多数人走到第一步就放弃了。</p>
+<p>所以我做了个东西：<strong>把 8086 CPU 和那几个外设搬进浏览器</strong>。打开网页就能按「开始」，看数码管从 20 倒数；按抢答键，定格、锁定、蜂鸣器响一声。</p>
+<p><strong>源码一字未改。</strong></p>
+<p>在线地址：https://leslieryin.github.io/8086-emulator-lab/</p>
+<p><img alt="单步执行：代码高亮前移，寄存器与数码管同步更新" src="images/demo.gif" /></p>
+<h2>二、为什么不模拟电路</h2>
+<p>最直接的想法是"在浏览器里跑 Proteus"，但这不现实——Proteus 模拟的是电路层面的电气行为，要做到那个精度，等于重写一个 SPICE。</p>
+<p>我换了个角度想这件事：<strong>课设真正想验证的是什么？</strong></p>
+<p>不是"这个电路能不能导通"，而是"<strong>这段汇编的逻辑对不对</strong>"。8255 的输出有没有送到数码管、中断来了有没有进 ISR、标志位判断对不对——这些才是学生要证明的东西。</p>
+<p>所以我的取舍是：</p>
+<ul>
+<li><strong>不模拟电路</strong>，只模拟 CPU 和芯片的<strong>寄存器行为</strong></li>
+<li><strong>不做机器码编码</strong>——直接把源码解析成指令对象列表交给执行器</li>
+</ul>
+<p>第二个取舍换来一个很实用的好处：<strong>能高亮正在执行的源码行</strong>。教学场景里，"代码走到第 47 行、此时 ZF=1"比"地址 0x1A3 处执行 74 02"有用得多。</p>
+<p>代价是要自己实现一套汇编解析器（两遍扫描：先收集符号、分配数据段地址，再解析操作数——因为 <code>CALL SCAN_DISPLAY</code> 这种前向引用必须先知道标签在哪）。目前支持 41 条指令，覆盖这三个程序用到的全部。</p>
+<p>CPU 侧带真实的标志位语义（ZF/SF/CF/OF/PF/AF）、16 位栈、<code>CALL</code>/<code>RET</code>/<code>LOOP</code>。</p>
+<h2>三、跑起来之后，发现代码里有个 bug</h2>
+<p>这是整件事里最有意思的部分。</p>
+<p>抢答器交上去之后，我在模拟器里跑，发现：<strong>1 号键按下去毫无反应。</strong></p>
+<p>代码是这样的：</p>
+<pre><code class="language-asm">CHECK_ANSWER_KEY:
+        IN AL,DX
+        TEST AL,02H                    ; 检测PC1
+        JZ CHECK_PLAYER2               ; 若PC1未按，则去检查2号
+</code></pre>
+<p><strong>注释是对的，代码写反了。</strong></p>
+<p>按键约定低电平有效，PC1 = 0 表示按下。逐条推：</p>
+<ul>
+<li><code>TEST AL,02H</code> 在 PC1=0 时，结果 = 0，<strong>ZF=1</strong></li>
+<li><code>JZ</code> 是"ZF=1 就跳"</li>
+</ul>
+<p>所以实际逻辑变成了：<strong>按下才跳走</strong>。跟注释说的"未按下才跳过"正好相反。</p>
+<p>真实的运行现象：</p>
+<ul>
+<li><strong>按 1 号键</strong>：PC1 被拉低 → <code>JZ</code> 跳去 <code>CHECK_PLAYER2</code> → 此时 PC2 是高电平 → <code>TEST AL,04H</code> 非零 → <code>JNZ CAK_EXIT</code> → <strong>直接退出，什么也没发生</strong></li>
+<li><strong>按 2 号键</strong>：PC2 = 1 让 <code>TEST AL,04H</code> 非零 → <code>JNZ CAK_EXIT</code> 不跳 → 顺序执行到 <code>MOV WINNER,2</code> → 2 号赢</li>
+</ul>
+<p>换句话说：<strong>这套代码只有一个键能用，而且它判的永远是 2 号。</strong></p>
+<p><img alt="抢答锁定：数码管定格，锁定标志亮起" src="images/shot-locked.png" /></p>
+<p>修正版把那一行改成 <code>JNZ</code>，1 号键立刻正常，2 号键不受影响。其余代码一字未动，界面上可以随时切换两个版本对照。</p>
+<blockquote>
+<p>这也是我觉得模拟器有用的地方：现象在 Proteus 里也能看到，但<strong>从一个"按了没反应"的现象，定位到"一个字符写反了"，中间隔着很多可能</strong>。能单步、能看 ZF、能高亮当前行跟着走，这个过程会快很多。</p>
+</blockquote>
+<h2>四、10 Hz 是怎么来的</h2>
+<p>第二个实验是 ADC0808 定时采样。要求每 0.1 秒采一次，也就是说需要一个 <strong>10 Hz 的中断源</strong>。</p>
+<p>时钟是 1 MHz。直觉上直接分频就行了——但 <strong>8253/8254 每个计数器只有 16 位，最大初值 65536</strong>。</p>
+<pre><code>1 MHz ÷ 10 Hz = 100000
+100000 &gt; 65536  ← 一级分频装不下
+</code></pre>
+<p>所以必须两级级联：</p>
+<pre><code>1 MHz ── 8253 C0（方式3，初值 1000）──→ 1 kHz
+                                            │
+                                            ↓
+              10 Hz ←── 8253 C1（方式2，初值 100）
+</code></pre>
+<ul>
+<li>定时器 0 工作在方式 3（方波），初值 1000 → 1 MHz / 1000 = 1 kHz</li>
+<li>定时器 1 工作在方式 2（速率发生器），初值 100 → 1 kHz / 100 = 10 Hz</li>
+<li>定时器 1 的输出接到 8259 的 IR0</li>
+</ul>
+<p>模拟器里，8253 是<strong>每执行一条指令推进 33.3 个输入时钟</strong>（这个数字是从 3 万 IPS 的指令速率反推的，见下）。计数器 0 满 1000 个时钟吐一个脉冲，计数器 1 满 100 个这样的脉冲再吐一次。</p>
+<p>中断链路三个设备串起来：</p>
+<ul>
+<li><strong>8259</strong> 收到脉冲就把 IR0 挂起。程序用 ICW1/ICW2/ICW4 初始化成单片模式、向量基址 <code>0x60</code>，再用 OCW1 写 <code>0xFE</code> 只放开 IR0</li>
+<li><strong>CPU</strong> 每步检查：只要 <code>IF=1</code> 且 8259 有请求，就压栈 flags/CS/IP，从 <code>向量号 × 4</code> 读出新 IP，跳进 ISR</li>
+</ul>
+<p>这里有个容易踩的坑：<strong><code>HLT</code> 的语义</strong>。</p>
+<p>它不是"程序结束"，而是"<strong>停机等中断</strong>"——外设时钟照常走，中断一到就恢复执行。</p>
+<p>ADC 程序末尾是一个 <code>HLT / JMP</code> 循环，在模拟器里看起来 CPU 停住了，实际每 0.1 秒醒一次，醒来采样、更新数码管、再 HLT。如果按"程序结束"来实现 <code>HLT</code>，这个实验根本跑不起来。</p>
+<p><img alt="ADC 定时采样：左侧源码、右侧数码管显示采样值" src="images/shot-adc.png" /></p>
+<h2>五、一个没设计过的巧合</h2>
+<p>这个程序的段定义里，<code>VECTOR_TABLE</code> 声明在最前面：</p>
+<pre><code class="language-asm">VECTOR_TABLE SEGMENT
+    DB 1024 DUP(0)
+VECTOR_TABLE ENDS
+</code></pre>
+<p>解析器按<strong>段定义顺序线性分配地址</strong>，所以向量表正好落在 <code>0x0000–0x03FF</code>，后面的变量从 1024 开始。</p>
+<p>而程序里写中断向量用的是：</p>
+<pre><code class="language-asm">MOV ES,0
+MOV ES:[BX], ...
+</code></pre>
+<p><code>IRQ_TYPE = 60H</code> 时写到物理地址 <code>60H × 4 = 0x180</code>——<strong>正好落在向量表里</strong>。实测读回来正是 <code>IRQ_HANDLER</code> 的指令索引。</p>
+<p>这个对齐不是我设计的，是"线性分配"这个通用规则自然落出来的结果。<strong>但换个把向量表声明在后面的程序，这套简化模型就会错位。</strong> 这是已知的边界，README 里写明了。</p>
+<h2>六、速度为什么要调成 3 万 IPS</h2>
+<p>按指令数限速，<code>BASE_IPS = 30000</code>。</p>
+<p>这个数字是实测出来的：课设的软件延时循环（<code>WAIT_10MS</code> 循环 100 次算 1 秒）在解释器里大约对应 3 万条指令。调到这个值，屏幕上 20 秒倒计时才和真实时间对得上。</p>
+<p>数字小了倒计时走得像卡住，大了十几秒就闪完。</p>
+<h2>七、做到什么程度，哪里不行</h2>
+<p><strong>已经覆盖的</strong>：抢答器（解析、上电初始化、开始键、倒计时、两个版本的抢答行为、锁定后按键无效、超时自动锁定）、ADC（向量表落位、8253 两级分频初值、8259 向量基址与屏蔽字、<code>ES:[BX]</code> 写入的向量指向 ISR、<code>HLT</code> 等待语义、1 秒内约 10 次采样）。</p>
+<p>52 项断言，跑的是内嵌的真实课设汇编，断言的是<strong>外设层面可观测的行为</strong>（数码管显示什么、谁被判赢、锁定标志、蜂鸣器有没有响、采样率多少），不是内部实现细节。CI 每次提交都跑。</p>
+<p><strong>明确的限制</strong>（这些我写进 README 了，不藏着）：</p>
+<ul>
+<li>只支持这三个程序用到的 41 条指令，不是完整 8086 指令集</li>
+<li>8253/8254 只按"每指令固定时钟数"推进，没有门控、读回、方式 0 之外的中断行为</li>
+<li>ADC0808 的转换被视为瞬时完成（真实器件约 100 μs，但课设的延时循环远长于此，不影响结果）</li>
+<li>时序不是周期级的，指令之间的相对快慢准，绝对周期数不准</li>
+<li>内存布局假定向量表声明在数据段最前</li>
+</ul>
+<h2>八、地址</h2>
+<ul>
+<li>在线试用：https://leslieryin.github.io/8086-emulator-lab/</li>
+<li>模拟器源码：https://github.com/Leslieryin/8086-emulator-lab</li>
+<li>课设原件（含 Proteus 工程和重构前后对照）：https://github.com/Leslieryin/8086-microcomputer-lab</li>
+</ul>
+<p>单文件网页，零依赖，断网也能用。如果你们学校还在用 Proteus 做微机原理课设，可以直接把这个链接发给老师或者同学——不用装任何东西，打开就能看。</p>
+<blockquote>
+<p>本文写于 2026 年 10 月。模拟器还在更新，如果后续支持了更多指令或芯片，以仓库 README 为准。</p>
+</blockquote>
+<hr />
+</article>
+</div>
+
+<footer>
+  <div class="wrap">
+    <span>模拟器与课设原件均以 MIT 许可开源</span>
+    <a href="https://github.com/Leslieryin">github.com/Leslieryin</a>
+  </div>
+</footer>
+
+</body>
+</html>
